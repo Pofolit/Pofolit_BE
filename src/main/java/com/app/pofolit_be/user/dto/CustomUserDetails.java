@@ -1,6 +1,6 @@
-package com.app.pofolit_be.dto;
+package com.app.pofolit_be.user.dto;
 
-import com.app.pofolit_be.entity.User;
+import com.app.pofolit_be.user.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

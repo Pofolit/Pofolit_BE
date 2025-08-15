@@ -1,7 +1,10 @@
-package com.app.pofolit_be.entity;
+package com.app.pofolit_be.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
+
+import java.util.UUID;
 
 @Builder
 @AllArgsConstructor
@@ -11,17 +14,18 @@ import lombok.*;
 public class User {
 
    @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   private Long id;
+   @GeneratedValue(generator = "UUID")
+   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+   @Column(columnDefinition = "BINARY(16)")
+   private UUID id;
 
    @Column(unique = true)
    private String email;
    private String nickname;
    private String profileImageUrl;
 
-   @Column(unique = true)
    private String providerId;
-   private String provider;
+   private String registrationId;
 
    private String refreshToken;
 

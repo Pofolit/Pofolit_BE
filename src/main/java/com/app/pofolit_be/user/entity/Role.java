@@ -1,4 +1,4 @@
-package com.app.pofolit_be.entity;
+package com.app.pofolit_be.user.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
