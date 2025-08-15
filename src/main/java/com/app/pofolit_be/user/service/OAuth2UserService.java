@@ -37,7 +37,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
               .orElseThrow(() -> new OAuth2AuthenticationException("Unsupported provider: " + registrationId))
               .convertToDto(oAuth2User.getAttributes(), registrationId);
 
-      User user = userRepository.findByProvider(registrationId, cDto.providerId())
+      User user = userRepository.findByRegistrationIdAndProviderId(registrationId, cDto.providerId())
               .map(existingUser -> existingUser.update(cDto.nickname(), cDto.profileImageUrl()))
               .orElse(User.builder()
                       .email(cDto.email())

@@ -10,7 +10,7 @@ build/
 node_modules
 
 ### Secrets ###
-.env
+src/main/resources/.env
 
 ### STS ###
 .apt_generated
