@@ -11,6 +11,11 @@ wrapper/
 node_modules
 
 ### Secrets ###
+.env
+
+### Node ###
+node_modules
+
 src/main/resources/.env
 
 ### STS ###
