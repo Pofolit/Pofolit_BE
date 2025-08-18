@@ -28,8 +28,8 @@ public class OAuth2AuthSuccessHandler extends SimpleUrlAuthenticationSuccessHand
 
     private final JwtUtil jwtUtil;
 
-    @Value("${app.oauth2.redirect-uri:http://localhost:3000/auth/callback}")
-    private String redirectUri;
+    @Value("${app.oauth2.auth.callback:http://localhost:3000/}")
+    private String baseUri = "http://localhost:3000/";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -39,6 +39,7 @@ public class OAuth2AuthSuccessHandler extends SimpleUrlAuthenticationSuccessHand
             // OAuth2 인증된 사용자 정보 추출
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             User user = userDetails.getUser();
+            log.info("userDetails(principal) : {}", userDetails );
 
             // JWT 토큰 생성
             String jwtToken = jwtUtil.generateToken(
@@ -50,14 +51,14 @@ public class OAuth2AuthSuccessHandler extends SimpleUrlAuthenticationSuccessHand
             log.info("OAuth2 로그인 성공 - JWT 토큰 발급: userId={}, email={}, provider={}",
                     user.getId(), user.getEmail(), user.getRegistrationId());
 
-            // 프론트엔드로 리다이렉트 URL 생성 (토큰 포함)
-            String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
+            // to Front URL (토큰 with in header)
+            String targetUrl = UriComponentsBuilder.fromUriString(baseUri)
                     .queryParam("token", jwtToken)
                     .queryParam("user", URLEncoder.encode(user.getNickname(), StandardCharsets.UTF_8))
                     .build()
                     .toUriString();
 
-            log.debug("OAuth2 성공 리다이렉트 URL: {}", targetUrl);
+            log.info("OAuth2 성공 리다이렉트 URL: {}", targetUrl);
 
             // 리다이렉트 실행
             getRedirectStrategy().sendRedirect(request, response, targetUrl);
@@ -66,7 +67,7 @@ public class OAuth2AuthSuccessHandler extends SimpleUrlAuthenticationSuccessHand
             log.error("OAuth2 인증 성공 처리 중 오류 발생: {}", e.getMessage(), e);
             
             // 오류 발생 시 에러 페이지로 리다이렉트
-            String errorUrl = UriComponentsBuilder.fromUriString(redirectUri)
+            String errorUrl = UriComponentsBuilder.fromUriString(baseUri)
                     .queryParam("error", "authentication_failed")
                     .queryParam("message", URLEncoder.encode("인증 처리 중 오류가 발생했습니다", StandardCharsets.UTF_8))
                     .build()
@@ -88,7 +89,7 @@ public class OAuth2AuthSuccessHandler extends SimpleUrlAuthenticationSuccessHand
             return targetUrl;
         }
         
-        return redirectUri; // 기본 리다이렉트 URI 사용
+        return baseUri; // 기본 리다이렉트 URI 사용
     }
 
     /**

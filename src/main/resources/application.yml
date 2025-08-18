@@ -1,5 +1,7 @@
 app:
-
+  oauth2:
+    auth:
+      callback:
 server:
   port: 8080
 logging:
@@ -9,7 +11,7 @@ logging:
 spring:
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST:root}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:sa}
       database: 0

@@ -7,8 +7,8 @@ wrapper/
 ### test ###
 **/src/test/**
 
-### Node ###
-node_modules
+### mcp ###
+.junie
 
 ### Secrets ###
 .env
