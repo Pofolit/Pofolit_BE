@@ -139,7 +139,7 @@ public class JwtUtil {
             Date expiration = getExpirationDateFromToken(token);
             return expiration.before(new Date());
         } catch (JwtException e) {
-            return true; // 파싱 실패 시 만료된 것으로 간주 ㅇㅇ
+            return true; // 파싱 실패 시 만료된 것으로 간주
         }
     }
 
