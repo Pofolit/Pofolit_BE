@@ -96,7 +96,7 @@ public class JwtUtil {
     }
 
     /**
-     * JWT 토큰에서 특정 Claim 추출
+     * JWT 토큰 페이로드에서 특정 Claim 추출
      */
     public <T> T getClaimFromToken(String token, ClaimsResolver<T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
