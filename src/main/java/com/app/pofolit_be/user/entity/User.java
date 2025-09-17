@@ -1,12 +1,15 @@
 package com.app.pofolit_be.user.entity;
 
-import com.app.pofolit_be.user.dto.SignDto;
 import com.app.pofolit_be.user.dto.SignupRequest;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "users",
@@ -19,48 +22,61 @@ import java.time.LocalDate;
 @Entity
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+   @Id
+   @GeneratedValue(generator = "UUID")
+   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+   @Column(columnDefinition = "BINARY(16)")
+   private UUID id;
 
-    @Column(unique = true)
-    private String email;
-    private String nickname;
-    @Column(name = "profile_image_url", length = 355)
-    private String profileImageUrl; // 카카오:110px*110px
-    private LocalDate birthDay;
-    private String job;
-    private String domain;
+   @Column(unique = true)
+   private String email;
+   private String nickname;
+   @Column(name = "profile_image_url", length = 355)
+   private String profileImageUrl; // 카카오:110px*110px
 
-    private String providerId;
-    private String registrationId;
+   private String providerId;
+   private String registrationId;
+   private LocalDate birthDay;
+   private String job;
+   private String domain;
+   @ElementCollection(fetch = FetchType.LAZY)
+   @CollectionTable(name = "user_interests", joinColumns = @JoinColumn(name = "user_id"))
+   @Column(name = "interests_id")
+   private List<String> interests;
 
-    @Setter
-    @Enumerated(EnumType.STRING)
-    private Role role;
+   @Enumerated(EnumType.STRING)
+   private Role role;
 
+   private String refreshToken;
 
-    @Builder
-    public User(String email, String nickname, String profileImageUrl, String providerId,
-                String registrationId, Role role) {
-        this.email = email;
-        this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
-        this.providerId = providerId;
-        this.registrationId = registrationId;
-        this.role = role;
-    }
+   @Builder
+   public User(UUID id, String email, String nickname, String profileImageUrl, String providerId, String registrationId, Role role) {
+      this.id = id;
+      this.email = email;
+      this.nickname = nickname;
+      this.profileImageUrl = profileImageUrl;
+      this.providerId = providerId;
+      this.registrationId = registrationId;
+      this.role = role;
+   }
 
-    public void updateUser(SignDto signDto) {
-        this.nickname = signDto.nickname();
-        this.profileImageUrl = signDto.profileImageUrl();
-    }
+   public void updateSocialProfile(String nickname, String profileImageUrl) {
+      this.nickname = nickname;
+      this.profileImageUrl = profileImageUrl;
+      //      return this;
+   }
 
-    public void signup(SignupRequest request) {
-        this.nickname = request.nickname();
-        this.birthDay = request.birthDay();
-        this.domain = request.domain();
-        this.job = request.job();
-        this.role = Role.USER;
-    }
+   // 리프레시 토큰 생성하ㅏㄹ때 파라미터 : new HashMap<>(), userId.toString(), refreshExp
+   public void updateRefreshToken(String refreshToken) {
+      this.refreshToken = refreshToken;
+   }
+
+   public void signup(SignupRequest request) {
+      this.nickname = request.nickname();
+      this.birthDay = request.birthDay();
+      this.domain = request.domain();
+      this.job = request.job();
+      this.interests = request.interests();
+      this.role = Role.USER;
+   }
 }

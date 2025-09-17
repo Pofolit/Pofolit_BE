@@ -3,15 +3,10 @@ package com.app.pofolit_be.user.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
- * SignupRequestDto
- *
- * @param nickname
- * @param birthDay
- * @param profileImageUrl
- * @param domain
- * @param job
+ * Sign up RequestDto
  */
 public record SignupRequest(
         String nickname,
@@ -20,6 +15,8 @@ public record SignupRequest(
         @JsonProperty("profileImageUrl")
         String profileImageUrl,
         String domain,
-        String job
+        String job,
+        List<String> interests
 )
-{ }
+{
+}
