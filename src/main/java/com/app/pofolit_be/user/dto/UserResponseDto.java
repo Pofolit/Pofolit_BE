@@ -1,26 +1,34 @@
 package com.app.pofolit_be.user.dto;
 
 import com.app.pofolit_be.user.entity.User;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+
 /**
- * for only response  GET "api/v1/~me"
-* */
+ * UserResponseDTO
+ *
+ * @param email
+ * @param nickname
+ * @param profileImageUrl
+ * @param birthDay
+ * @param domain
+ * @param job
+ */
 public record UserResponseDto(
+        String email,
         String nickname,
-        @JsonProperty("profileImageUrl")
         String profileImageUrl,
         LocalDate birthDay,
-        @JsonProperty("birthDay")
         String domain,
-        String job,
-        List<String> interests
+        String job
 )
 {
-   public static UserResponseDto from(User user) {
-      return new UserResponseDto(user.getNickname(), user.getProfileImageUrl(), user.getBirthDay(), user.getDomain(), user.getJob(), new ArrayList<>(user.getInterests()));
-   }
+    public static UserResponseDto from(User user) {
+        return new UserResponseDto(user.getEmail(),
+                user.getNickname(),
+                user.getProfileImageUrl(),
+                user.getBirthDay(),
+                user.getDomain(),
+                user.getJob());
+    }
 }
