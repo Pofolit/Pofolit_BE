@@ -1,16 +1,18 @@
 uri:
   auth:
-    base: "http://localhost:3000/auth/callback"
+    base: "http://localhost:3000"
     signup: "http://localhost:3000/signup"
 server:
   port: 8080
 logging:
   level:
-    root: info # TRACE < DEBUG < INFO < WARN < ERROR
-    org.hibernate.orm: WARN
+    root: INFO
+    org.hibernate.orm: INFO
 spring:
   config:
-    import: optional:classpath:.env[.properties] # 개발 단계에서 쓰는 환경변수. !배포 시 "classpath-> file"
+    import: optional:file:.env[.properties]
+  profiles:
+    active: dev
   data:
     redis:
       host: ${REDIS_HOST:127.0.0.1}
@@ -19,77 +21,73 @@ spring:
       timeout: 2000ms
       lettuce:
         pool:
-          max-active: 2
+          max-active: 8
           max-wait: -1ms
-          max-idle: 3
+          max-idle: 8
           min-idle: 0
   datasource:
-    #    url: jdbc:h2:mem:testdb # H2 in memory db
-    url: jdbc:h2:file:/h2/pofolitdb;AUTO_SERVER=TRUE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  jpa:
-    hibernate.ddl-auto: update #
-    properties.hibernate.format_sql: true
-    open-in-view: false
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-  flyway:
-    enabled: false
-    locations: classpath:db/migration
-    baseline-on-migrate: true
-    clean-disabled: true
+    url: ${DB_URL:jdbc:mysql://localhost:3306/pofolitdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:sa}
   jwt:
-    key-size: 1024
-    iss: pofolit
-    p-ttl: ${PRE_TOKEN_TTL:1800}
-    a-ttl: ${ACCESS_TOKEN_TTL:1800}
-    r-ttl: ${REFRESH_TOKEN_TTL:604800}
+    secret: ${JWT_SECRET:popopopopopfolitsercverpopopopopopfolitsercverpopopopopopfolitsercverpopopopopopfolitsercverpopopopopopfolitsercverpopopopopopfolitsercverpopopopopopfolitsercverpopopopopopfolitsercverpopopopopopfolitsercver}
+    expiration: ${JWT_EXP:36000}
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID:}
-            client-secret: ${GOOGLE_CLIENT_SECRET:}
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope:
               - openid
               - email
               - profile
           kakao:
-            client-id: ${KAKAO_CLIENT_ID:}
-            client-secret: ${KAKAO_CLIENT_SECRET:}
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
             client-authentication-method: client_secret_post
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope:
               - openid
-            client-name: kakao
+              - account_email
+              - profile_nickname
+              - profile_image
+            client-name: Kakao
         provider:
           kakao:
+            # OIDC 표준
             issuer-uri: https://kauth.kakao.com
-          google:
-            # 배포시 authorization-uri에서 access_type=offline 파라미터 제거
-            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline
-            token-uri: https://oauth2.googleapis.com/token
-            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
-            user-name-attribute: sub
 
-exclude:
-  path:
-    exception:
-      - /v3/api-docs
-      - /swagger-ui/**
-    filter:
-      - /health
-      - /error
-      - /login/**
-      - /signup/**
-      - /v3/api-docs/**
-      - /swagger-ui/**
-      - /swagger-resource/**
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  flyway:
+    enabled: false
+    locations: classpath:db/migration
     baseline-on-migrate: true
     clean-disabled: true
+---
+spring:
+  config:
+    activate:
+      on-profile: "test"
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  flyway:
+    enabled: false
